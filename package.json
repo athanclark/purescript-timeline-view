@@ -1,0 +1,26 @@
+{
+  "name": "purescript-timeline-view",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openchronology/purescript-timeline-view.git"
+  },
+  "author": "Athan Clark <athan.clark@gmail.com>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/openchronology/purescript-timeline-view/issues"
+  },
+  "homepage": "https://github.com/openchronology/purescript-timeline-view#readme",
+  "dependencies": {
+    "uuid": "^8.3.0",
+    "uuid-validate": "0.0.3"
+  }
+}
