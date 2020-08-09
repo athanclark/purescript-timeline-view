@@ -6,7 +6,9 @@ import Timeline.ID.TimeSpace (TimeSpaceID(..))
 import Timeline.ID.Timeline (TimelineID)
 import Timeline.ID.Event (EventID)
 import Timeline.ID.TimeSpan (TimeSpanID)
+import Timeline.ID.RootTimeSpaceOrParent (RootTimeSpaceOrParentID)
 import Prelude
+import Data.Maybe (Maybe (..))
 import Data.Default (def)
 import Data.UUID (genUUID) as UUID
 import Data.Generic.Rep (class Generic)
@@ -33,6 +35,7 @@ newtype TimeSpace
   , siblings :: UniqueArray (EventOrTimeSpanPoly EventID TimeSpanID) -- TODO manual field sorting
   , timelines :: UniqueArray TimelineID
   , id :: TimeSpaceID
+  , parent :: Maybe RootTimeSpaceOrParentID
   }
 
 derive instance genericTimeSpace :: Generic TimeSpace _
@@ -42,7 +45,7 @@ derive newtype instance eqTimeSpace :: Eq TimeSpace
 derive newtype instance showTimeSpace :: Show TimeSpace
 
 instance encodeJsonTimeSpace :: EncodeJson TimeSpace where
-  encodeJson (TimeSpace { title, description, timeScale, siblings, timelines, id }) =
+  encodeJson (TimeSpace { title, description, timeScale, siblings, timelines, id, parent }) =
     "title" := title
       ~> "description"
       := description
@@ -54,6 +57,8 @@ instance encodeJsonTimeSpace :: EncodeJson TimeSpace where
       := timelines
       ~> "id"
       := id
+      ~> "parent"
+      := parent
       ~> jsonEmptyObject
 
 instance decodeJsonTimeSpace :: DecodeJson TimeSpace where
@@ -65,7 +70,8 @@ instance decodeJsonTimeSpace :: DecodeJson TimeSpace where
     siblings <- o .: "siblings"
     timelines <- o .: "timelines"
     id <- o .: "id"
-    pure (TimeSpace { title, description, timeScale, siblings, timelines, id })
+    parent <- o .: "parent"
+    pure (TimeSpace { title, description, timeScale, siblings, timelines, id, parent })
 
 instance arbitraryEvent :: Arbitrary TimeSpace where
   arbitrary = do
@@ -75,18 +81,20 @@ instance arbitraryEvent :: Arbitrary TimeSpace where
     siblings <- arbitrary
     timelines <- arbitrary
     id <- arbitrary
-    pure (TimeSpace { title, description, timeScale, siblings, timelines, id })
+    parent <- arbitrary
+    pure (TimeSpace { title, description, timeScale, siblings, timelines, id, parent })
 
 defaultTimeSpace :: Effect TimeSpace
-defaultTimeSpace = newTimeSpace { title: "TimeSpace Name", description: "", timeScale: def }
+defaultTimeSpace = newTimeSpace { title: "TimeSpace Name", description: "", timeScale: def, parent: Nothing }
 
 newTimeSpace ::
   { title :: String
   , description :: String
   , timeScale :: TimeScale
+  , parent :: Maybe RootTimeSpaceOrParentID
   } ->
   Effect TimeSpace
-newTimeSpace { title, description, timeScale } = do
+newTimeSpace { title, description, timeScale, parent } = do
   id <- UUID.genUUID
   pure
     $ TimeSpace
@@ -96,4 +104,5 @@ newTimeSpace { title, description, timeScale } = do
         , siblings: UniqueArray.empty
         , timelines: UniqueArray.empty
         , id: TimeSpaceID id
+        , parent
         }

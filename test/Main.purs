@@ -5,10 +5,8 @@ import Timeline.UI.TimeSpan (TimeSpan) as UI
 import Timeline.UI.EventOrTimeSpan (EventOrTimeSpan) as UI
 import Timeline.UI.Settings (Settings) as UI
 import Timeline.UI.Timeline (Timeline) as UI
-import Timeline.UI.Timeline.Children (Children) as UI
 import Timeline.UI.TimeSpace (TimeSpace) as UI
 import Timeline.UI.TimeSpace.TimeScale (TimeScale) as UI
-import Timeline.UI.TimeSpace.Siblings (Siblings) as UI
 
 import Prelude
 import Data.Maybe (Maybe (..))
@@ -31,15 +29,13 @@ main = launchAff_ $ runSpec' (defaultConfig {timeout = Nothing}) [consoleReporte
 tests :: SpecT Aff Unit Identity Unit
 tests = do
   describe "Json" do
+    jsonTest "TimeSpace" (Proxy :: Proxy UI.TimeSpace)
+    jsonTest "TimeScale" (Proxy :: Proxy UI.TimeScale)
+    jsonTest "Timeline" (Proxy :: Proxy UI.Timeline)
     jsonTest "Event" (Proxy :: Proxy UI.Event)
     jsonTest "TimeSpan" (Proxy :: Proxy UI.TimeSpan)
     jsonTest "EventOrTimeSpan" (Proxy :: Proxy UI.EventOrTimeSpan)
     jsonTest "Settings" (Proxy :: Proxy UI.Settings)
-    jsonTest "TimeScale" (Proxy :: Proxy UI.TimeScale)
-    jsonTest "Timeline" (Proxy :: Proxy UI.Timeline)
-    jsonTest "TimeSpace" (Proxy :: Proxy UI.TimeSpace)
-    jsonTest "Children" (Proxy :: Proxy UI.Children)
-    jsonTest "Siblings" (Proxy :: Proxy UI.Siblings)
   where
     jsonTest :: forall a
               . Arbitrary a

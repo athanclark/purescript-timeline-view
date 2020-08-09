@@ -6,6 +6,7 @@ import Timeline.ID.Timeline (TimelineID)
 import Timeline.ID.Event (EventID)
 import Timeline.ID.TimeSpan (TimeSpanID)
 import Prelude
+import Data.Maybe (Maybe)
 import Data.Generic.Rep (class Generic)
 import Data.Argonaut (class EncodeJson, class DecodeJson, (:=), (~>), jsonEmptyObject, (.:), decodeJson)
 import Data.Array.Unique (UniqueArray)
@@ -19,7 +20,7 @@ newtype Timeline
   -- TODO color
   , children :: UniqueArray (EventOrTimeSpanPoly EventID TimeSpanID)
   , id :: TimelineID
-  , timeSpace :: TimeSpaceID
+  , parent :: Maybe TimeSpaceID
   }
 
 derive instance genericTimeline :: Generic Timeline _
@@ -29,7 +30,7 @@ derive newtype instance eqTimeline :: Eq Timeline
 derive newtype instance showTimeline :: Show Timeline
 
 instance encodeJsonTimeline :: EncodeJson Timeline where
-  encodeJson (Timeline { name, description, children, id, timeSpace }) =
+  encodeJson (Timeline { name, description, children, id, parent }) =
     "name" := name
       ~> "description"
       := description
@@ -37,8 +38,8 @@ instance encodeJsonTimeline :: EncodeJson Timeline where
       := children
       ~> "id"
       := id
-      ~> "timeSpace"
-      := timeSpace
+      ~> "parent"
+      := parent
       ~> jsonEmptyObject
 
 instance decodeJsonTimeline :: DecodeJson Timeline where
@@ -48,8 +49,8 @@ instance decodeJsonTimeline :: DecodeJson Timeline where
     description <- o .: "description"
     children <- o .: "children"
     id <- o .: "id"
-    timeSpace <- o .: "timeSpace"
-    pure (Timeline { name, description, children, id, timeSpace })
+    parent <- o .: "parent"
+    pure (Timeline { name, description, children, id, parent })
 
 instance arbitraryTimeline :: Arbitrary Timeline where
   arbitrary = do
@@ -57,5 +58,5 @@ instance arbitraryTimeline :: Arbitrary Timeline where
     description <- genString
     children <- arbitrary
     id <- arbitrary
-    timeSpace <- arbitrary
-    pure (Timeline { name, description, children, id, timeSpace })
+    parent <- arbitrary
+    pure (Timeline { name, description, children, id, parent })
